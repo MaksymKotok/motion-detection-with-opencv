@@ -1,15 +1,10 @@
 import cv2
-from math import fabs
-import sys
-import os
-import time
 
 
 MIN_AREA = 1000
 MAX_AREA = 800000
 
 cap = cv2.VideoCapture(0)
-time.sleep(2)
 
 cap.set(3, 640)
 cap.set(4, 480)
@@ -20,13 +15,6 @@ _, bg = cap.read()
 bg = cv2.cvtColor(bg, cv2.COLOR_BGR2GRAY)
 bg = cv2.GaussianBlur(bg, (21, 21), 0)
 
-imagesPath = "images"
-
-if not os.path.exists(imagesPath):
-    os.makedirs(imagesPath)
-
-imagesIndexes = [int(img.lstrip("img-").rstrip(".png")) for img in os.listdir("images/")]
-imageCount = max(imagesIndexes) if len(imagesIndexes) else 0
 
 while cap.isOpened():
     status, frame = cap.read()
@@ -50,19 +38,7 @@ while cap.isOpened():
         if w >= frameWidth and h >= frameHeight:
             continue
 
-        # Comment/Uncomment the three lines below to hide/visualize contours and centres
         cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 255, 0), 3)
-        cv2.circle(frame, (frameWidth // 2, frameHeight // 2), 0, (0, 0, 255), 8)
-        cv2.circle(frame, (x + w // 2, y + h // 2), 0, (0, 255, 0), 8)
-
-        if (x + w // 2 == frameWidth // 2) and (y + h // 2 == frameHeight // 2):
-            print(imageCount)
-            cropped = frame[y: y + h, x: x + w]
-            filePath = f"/images/img-{imageCount}.png"
-            print(sys.path[0] + filePath)
-            cv2.imwrite(sys.path[0] + filePath, cropped)
-            imageCount += 1
-            print([x, y, w, h])
 
     cv2.imshow("Contours", frame)
     cv2.imshow("Threshold", thresh)
